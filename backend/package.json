@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "test": "node test/runTests.js"
+    "test": "node test/runTests.cjs"
   },
   "keywords": [],
   "author": "",
