@@ -440,9 +440,9 @@ function Home({ search }) {
                 <Link to={`/product/${product._id}`}>
 
                   <img
-                    src={
+                                        src={
                       product.image
-                        ? `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
+                        ? `https://ecommerce-iq9w.onrender.com/uploads/${product.image}`
                         : 'https://via.placeholder.com/300'
                     }
                     alt={product.name}

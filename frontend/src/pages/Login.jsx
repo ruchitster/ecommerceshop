@@ -22,6 +22,9 @@ function Login() {
   const [error, setError] =
     useState('')
 
+  // =========================
+  // HANDLE CHANGE
+  // =========================
   const handleChange = (e) => {
 
     setFormData({
@@ -31,6 +34,9 @@ function Login() {
     })
   }
 
+  // =========================
+  // HANDLE SUBMIT
+  // =========================
   const handleSubmit = async (e) => {
 
     e.preventDefault()
@@ -40,15 +46,22 @@ function Login() {
       setLoading(true)
       setError('')
 
+      // =========================
+      // LOGIN API
+      // =========================
       const { data } =
         await API.post(
-          '/auth/login',
+          '/api/auth/login',
           formData
         )
 
+      console.log('Login Response:', data)
+
+      // =========================
       // BLOCK ADMIN LOGIN
+      // =========================
       if (
-        data.user.role === 'admin'
+        data.user?.role === 'admin'
       ) {
 
         setError(
@@ -58,6 +71,9 @@ function Login() {
         return
       }
 
+      // =========================
+      // STORE TOKEN
+      // =========================
       localStorage.setItem(
         'token',
         data.token
@@ -68,11 +84,17 @@ function Login() {
         JSON.stringify(data.user)
       )
 
+      // =========================
+      // REDIRECT
+      // =========================
       navigate('/')
 
     } catch (error) {
 
-      console.log(error)
+      console.log(
+        'Login Error:',
+        error
+      )
 
       setError(
 
@@ -116,6 +138,7 @@ function Login() {
 
         )}
 
+        {/* EMAIL */}
         <input
           type="email"
           name="email"
@@ -126,6 +149,7 @@ function Login() {
           required
         />
 
+        {/* PASSWORD */}
         <input
           type="password"
           name="password"
@@ -136,16 +160,18 @@ function Login() {
           required
         />
 
+        {/* BUTTON */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition"
+          className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition disabled:opacity-70"
         >
           {loading
             ? 'Logging in...'
             : 'Login'}
         </button>
 
+        {/* REGISTER */}
         <p className="text-center text-gray-600 mt-6">
 
           Don't have an account?{' '}

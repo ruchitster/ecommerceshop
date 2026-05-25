@@ -4,13 +4,20 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import API from '../services/api'
 
 function Auth() {
+
   const navigate = useNavigate()
   const location = useLocation()
 
   const initialMode = useMemo(() => {
+
     const p = location?.pathname || ''
-    if (p.includes('register')) return 'register'
+
+    if (p.includes('register')) {
+      return 'register'
+    }
+
     return 'login'
+
   }, [location?.pathname])
 
   const [mode, setMode] = useState(initialMode)
@@ -24,95 +31,175 @@ function Auth() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // =========================
+  // HANDLE CHANGE
+  // =========================
   const handleChange = (e) => {
+
     setError('')
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
   }
 
+  // =========================
+  // SUBMIT
+  // =========================
   const submit = async (e) => {
+
     e.preventDefault()
+
     setLoading(true)
     setError('')
 
     try {
-      // Required behavior per task:
-      // if user exists -> login, else -> register, then login.
-      // Since backend currently doesn't expose a check endpoint, we attempt login first.
-      // If invalid credentials happens, we interpret it as "email not registered" and register.
 
-      const loginRes = await API.post('/auth/login', {
-        email: formData.email,
-        password: formData.password,
-      })
+      // =========================
+      // LOGIN FIRST
+      // =========================
+
+      const loginRes = await API.post(
+        '/api/auth/login',
+        {
+          email: formData.email,
+          password: formData.password,
+        }
+      )
+
+      console.log('Login Success:', loginRes.data)
 
       const { token, user } = loginRes.data
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
 
-      if (user?.role === 'admin') navigate('/admin/dashboard')
-      else navigate('/')
+      localStorage.setItem('token', token)
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(user)
+      )
+
+      if (user?.role === 'admin') {
+        navigate('/admin/dashboard')
+      } else {
+        navigate('/')
+      }
+
       return
+
     } catch (loginErr) {
-      // fallback: if login fails, register then login
+
+      console.log('Login Error:', loginErr)
+
+      // =========================
+      // REGISTER IF LOGIN FAILS
+      // =========================
+
       try {
+
         const registerPayload = {
           name: formData.name,
           email: formData.email,
           password: formData.password,
         }
 
-        await API.post('/auth/register', registerPayload)
+        await API.post(
+          '/api/auth/register',
+          registerPayload
+        )
 
-        // login after successful register
-        const loginRes2 = await API.post('/auth/login', {
-          email: formData.email,
-          password: formData.password,
-        })
+        console.log('Register Success')
+
+        // =========================
+        // LOGIN AFTER REGISTER
+        // =========================
+
+        const loginRes2 = await API.post(
+          '/api/auth/login',
+          {
+            email: formData.email,
+            password: formData.password,
+          }
+        )
+
+        console.log(
+          'Login After Register:',
+          loginRes2.data
+        )
 
         const { token, user } = loginRes2.data
-        localStorage.setItem('token', token)
-        localStorage.setItem('user', JSON.stringify(user))
 
-        if (user?.role === 'admin') navigate('/admin/dashboard')
-        else navigate('/')
+        localStorage.setItem('token', token)
+
+        localStorage.setItem(
+          'user',
+          JSON.stringify(user)
+        )
+
+        if (user?.role === 'admin') {
+          navigate('/admin/dashboard')
+        } else {
+          navigate('/')
+        }
+
       } catch (regErr) {
-        const msg = regErr?.response?.data?.message || 'Authentication failed'
+
+        console.log('Register Error:', regErr)
+
+        const msg =
+          regErr?.response?.data?.message ||
+          'Authentication failed'
+
         setError(msg)
       }
+
     } finally {
+
       setLoading(false)
+
     }
   }
 
   return (
-    <div className='flex items-center justify-center min-h-screen'>
-      <div className='bg-white shadow-lg rounded-2xl p-8 w-[430px]'>
+
+    <div className='flex items-center justify-center min-h-screen bg-gray-100'>
+
+      <div className='bg-white shadow-2xl rounded-2xl p-8 w-[430px]'>
+
+        {/* HEADER */}
         <div className='flex gap-3 mb-6'>
+
           <button
             type='button'
             onClick={() => setMode('login')}
-            className={`flex-1 py-2 rounded-xl border ${
-              mode === 'login' ? 'bg-black text-white' : 'bg-white text-black'
+            className={`flex-1 py-2 rounded-xl border transition ${
+              mode === 'login'
+                ? 'bg-black text-white'
+                : 'bg-white text-black'
             }`}
           >
             Login
           </button>
+
           <button
             type='button'
             onClick={() => setMode('register')}
-            className={`flex-1 py-2 rounded-xl border ${
-              mode === 'register' ? 'bg-black text-white' : 'bg-white text-black'
+            className={`flex-1 py-2 rounded-xl border transition ${
+              mode === 'register'
+                ? 'bg-black text-white'
+                : 'bg-white text-black'
             }`}
           >
             Register
           </button>
+
         </div>
 
+        {/* FORM */}
         <form onSubmit={submit}>
+
           {mode === 'register' ? (
+
             <input
               type='text'
               name='name'
@@ -120,11 +207,15 @@ function Auth() {
               className='w-full border p-3 rounded-xl mb-4'
               onChange={handleChange}
               value={formData.name}
+              required
             />
+
           ) : (
+
             <div className='mb-4 text-sm text-gray-600'>
-              {"Tip: If the email isn't registered, submitting will auto-register."}
+              If account does not exist, it will auto-register.
             </div>
+
           )}
 
           <input
@@ -134,6 +225,7 @@ function Auth() {
             className='w-full border p-3 rounded-xl mb-4'
             onChange={handleChange}
             value={formData.email}
+            required
           />
 
           <input
@@ -143,30 +235,41 @@ function Auth() {
             className='w-full border p-3 rounded-xl mb-4'
             onChange={handleChange}
             value={formData.password}
+            required
           />
 
-          {error ? (
+          {/* ERROR */}
+          {error && (
+
             <div className='mb-4 text-red-600 text-sm'>
               {error}
             </div>
-          ) : null}
 
+          )}
+
+          {/* BUTTON */}
           <button
             type='submit'
             disabled={loading}
-            className='w-full bg-black text-white py-3 rounded-xl disabled:opacity-70'
+            className='w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 disabled:opacity-70'
           >
-            {loading ? 'Please wait...' : mode === 'register' ? 'Submit' : 'Login / Register'}
+            {loading
+              ? 'Please wait...'
+              : mode === 'register'
+              ? 'Register'
+              : 'Login'}
           </button>
 
           <div className='text-center mt-4 text-sm text-gray-600'>
             By continuing, you agree to the app terms.
           </div>
+
         </form>
+
       </div>
+
     </div>
   )
 }
 
 export default Auth
-
