@@ -65,7 +65,7 @@ function Home({ search }) {
 
     return () => clearInterval(interval)
 
-  }, [])
+  }, [heroImages.length])
 
   // =========================
   // FETCH PRODUCTS
@@ -77,15 +77,25 @@ function Home({ search }) {
       setLoading(true)
       setError('')
 
-      const { data } = await API.get(
-        `/api/products?search=${search}&category=${category}&subcategory=${subcategory}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}`
+      const response = await API.get(
+        `/api/products?search=${search || ''}&category=${category}&subcategory=${subcategory}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}`
       )
 
-      setProducts(data)
+      console.log('Products API:', response.data)
+
+      const data = response.data
+
+      setProducts(
+        Array.isArray(data)
+          ? data
+          : data.products || []
+      )
 
     } catch (error) {
 
-      console.log(error)
+      console.log('Products Error:', error)
+
+      setProducts([])
       setError('Failed to load products')
 
     } finally {
@@ -102,12 +112,23 @@ function Home({ search }) {
 
     try {
 
-      const { data } = await API.get('/api/categories')
-      setCategories(data)
+      const response = await API.get('/api/categories')
+
+      console.log('Categories API:', response.data)
+
+      const data = response.data
+
+      setCategories(
+        Array.isArray(data)
+          ? data
+          : data.categories || []
+      )
 
     } catch (error) {
 
-      console.log(error)
+      console.log('Categories Error:', error)
+
+      setCategories([])
 
     }
   }
@@ -119,12 +140,23 @@ function Home({ search }) {
 
     try {
 
-      const { data } = await API.get('/api/subcategories')
-      setSubcategories(data)
+      const response = await API.get('/api/subcategories')
+
+      console.log('Subcategories API:', response.data)
+
+      const data = response.data
+
+      setSubcategories(
+        Array.isArray(data)
+          ? data
+          : data.subcategories || []
+      )
 
     } catch (error) {
 
-      console.log(error)
+      console.log('Subcategories Error:', error)
+
+      setSubcategories([])
 
     }
   }
@@ -172,9 +204,11 @@ function Home({ search }) {
       return
     }
 
-    const filtered = subcategories.filter(
-      (sub) => sub.category?._id === value
-    )
+    const filtered = Array.isArray(subcategories)
+      ? subcategories.filter(
+          (sub) => sub.category?._id === value
+        )
+      : []
 
     setFilteredSubs(filtered)
   }
@@ -249,19 +283,20 @@ function Home({ search }) {
             {/* DOTS */}
             <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-3">
 
-              {heroImages.map((_, index) => (
+              {Array.isArray(heroImages) &&
+                heroImages.map((_, index) => (
 
-                <button
-                  key={index}
-                  onClick={() => setCurrentImage(index)}
-                  className={`w-3 h-3 rounded-full transition ${
-                    currentImage === index
-                      ? 'bg-white scale-125'
-                      : 'bg-gray-400'
-                  }`}
-                />
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImage(index)}
+                    className={`w-3 h-3 rounded-full transition ${
+                      currentImage === index
+                        ? 'bg-white scale-125'
+                        : 'bg-gray-400'
+                    }`}
+                  />
 
-              ))}
+                ))}
 
             </div>
 
@@ -302,11 +337,12 @@ function Home({ search }) {
             >
               <option value="">Categories</option>
 
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))}
+              {Array.isArray(categories) &&
+                categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
 
             </select>
 
@@ -317,11 +353,12 @@ function Home({ search }) {
             >
               <option value="">Subcategories</option>
 
-              {filteredSubs.map((sub) => (
-                <option key={sub._id} value={sub._id}>
-                  {sub.name}
-                </option>
-              ))}
+              {Array.isArray(filteredSubs) &&
+                filteredSubs.map((sub) => (
+                  <option key={sub._id} value={sub._id}>
+                    {sub.name}
+                  </option>
+                ))}
 
             </select>
 
@@ -383,7 +420,7 @@ function Home({ search }) {
             Loading Products...
           </div>
 
-        ) : products.length === 0 ? (
+        ) : !Array.isArray(products) || products.length === 0 ? (
 
           <div className="text-center text-gray-500 text-xl py-20">
             No products found
