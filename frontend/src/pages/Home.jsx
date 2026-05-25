@@ -78,7 +78,7 @@ function Home({ search }) {
       setError('')
 
       const { data } = await API.get(
-        `/products?search=${search}&category=${category}&subcategory=${subcategory}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}`
+        `/api/products?search=${search}&category=${category}&subcategory=${subcategory}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}`
       )
 
       setProducts(data)
@@ -102,7 +102,7 @@ function Home({ search }) {
 
     try {
 
-      const { data } = await API.get('/categories')
+      const { data } = await API.get('/api/categories')
       setCategories(data)
 
     } catch (error) {
@@ -119,7 +119,7 @@ function Home({ search }) {
 
     try {
 
-      const { data } = await API.get('/subcategories')
+      const { data } = await API.get('/api/subcategories')
       setSubcategories(data)
 
     } catch (error) {
@@ -369,6 +369,13 @@ function Home({ search }) {
 
         )}
 
+        {/* ERROR */}
+        {error && (
+          <div className="text-center text-red-500 text-lg mb-6">
+            {error}
+          </div>
+        )}
+
         {/* PRODUCTS */}
         {loading ? (
 
@@ -397,7 +404,7 @@ function Home({ search }) {
 
                   <img
                     src={
-product.image
+                      product.image
                         ? `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
                         : 'https://via.placeholder.com/300'
                     }
