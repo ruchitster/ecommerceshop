@@ -28,7 +28,7 @@ const app = express()
 // =======================
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://ecommerce-iq9w.onrender.com',
+  origin: 'https://ecommerce-whcu.vercel.app',
   credentials: true,
 }))
 
