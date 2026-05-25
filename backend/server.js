@@ -28,7 +28,7 @@ const app = express()
 // =======================
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || import.meta.env.VITE_API_URL,
+  origin: process.env.CLIENT_URL || 'https://ecommerce-iq9w.onrender.com',
   credentials: true,
 }))
 
