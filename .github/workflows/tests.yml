@@ -1,0 +1,67 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Backend install
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend tests (Jest)
+        working-directory: backend
+        env:
+          # Provide safe defaults; override in repo/CI secrets for real DB.
+          PORT: 5000
+          JWT_SECRET: test_jwt_secret
+          # If you use test DB, set MONGO_URI_TEST in secrets/CI.
+          MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+        run: npm test
+
+  frontend:
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint || true
+
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
+
+      # Optional Playwright E2E. Requires a running dev server + test creds.
+      # Enable once env/test users are configured.
+      - name: Playwright tests (optional)
+        if: ${{ always() }}
+        working-directory: frontend
+        env:
+          CI: true
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+        run: npx playwright test --reporter=html
+

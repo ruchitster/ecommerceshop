@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+html {
+  /* Reduce all frontend font sizing by ~20% */
+  font-size: 80%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
