@@ -31,7 +31,7 @@ function OrderDetails() {
       const token = localStorage.getItem('token')
 
       const res = await fetch(
-        `http://localhost:5000/api/invoice/${id}`,
+`${import.meta.env.VITE_API_URL}/invoice/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ function OrderDetails() {
             >
               <div className="flex gap-4">
                 <img
-                  src={`http://localhost:5000/uploads/${item.product?.image}`}
+src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product?.image}`}
                   alt=""
                   className="w-20 h-20 object-cover rounded-xl"
                 />

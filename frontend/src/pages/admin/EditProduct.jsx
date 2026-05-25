@@ -59,7 +59,7 @@ function EditProduct() {
 
       setVariants(product.variants || [])
 
-      setPreview(`http://localhost:5000/uploads/${product.image}`)
+setPreview(`${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`)
 
       const filtered = subRes.data.filter(
         (sub) => sub.category._id === product.category

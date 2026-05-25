@@ -397,8 +397,8 @@ function Home({ search }) {
 
                   <img
                     src={
-                      product.image
-                        ? `http://localhost:5000/uploads/${product.image}`
+product.image
+                        ? `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
                         : 'https://via.placeholder.com/300'
                     }
                     alt={product.name}

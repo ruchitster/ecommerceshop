@@ -28,7 +28,17 @@ const app = express()
 // =======================
 
 app.use(cors({
-  origin: 'https://ecommerce-whcu.vercel.app',
+  origin: function (origin, callback) {
+    if (
+      !origin ||
+      origin.includes('localhost') ||
+      origin.includes('vercel.app')
+    ) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
 }))
 

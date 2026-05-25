@@ -61,7 +61,7 @@ function ProductDetails() {
       if (!product?.image)
         return ''
 
-      return `http://localhost:5000/uploads/${product.image}`
+return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
     }, [product])
 

@@ -52,7 +52,7 @@ function ManageProducts() {
                 
                 {/* PRODUCT IMAGE */}
                 <img
-                  src={`http://localhost:5000/uploads/${product.image}`}
+src={`${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`}
                   alt={product.name}
                   className="w-16 h-16 rounded-xl object-cover border"
                 />
