@@ -225,7 +225,7 @@ function ProductDetails() {
 
       try {
 
-        await API.post(
+await API.post(
           '/api/cart/add',
           {
             productId: id,
