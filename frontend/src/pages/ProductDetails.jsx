@@ -73,7 +73,7 @@ return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
         const { data } =
           await API.get(
-            `/api/products/${id}`
+            `/products/${id}`
           )
 
         setProduct(data)
