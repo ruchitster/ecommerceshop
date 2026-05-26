@@ -30,18 +30,14 @@ function OrderDetails() {
     try {
       const token = localStorage.getItem('token')
 
-      const res = await fetch(
-`${import.meta.env.VITE_API_URL}/api/invoice/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const res = await API.get(`/api/invoice/${id}`, {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-      if (!res.ok) throw new Error('Failed')
-
-      const blob = await res.blob()
+      const blob = res.data
       const url = window.URL.createObjectURL(blob)
 
       const a = document.createElement('a')
