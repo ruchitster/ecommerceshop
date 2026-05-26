@@ -61,7 +61,8 @@ function Auth() {
       // =========================
 
       const loginRes = await API.post(
-        '/api/auth/login',
+        '/auth/login',
+
         {
           email: formData.email,
           password: formData.password,
@@ -104,7 +105,8 @@ function Auth() {
         }
 
         await API.post(
-          '/api/auth/register',
+          '/auth/register',
+
           registerPayload
         )
 
@@ -115,7 +117,8 @@ function Auth() {
         // =========================
 
         const loginRes2 = await API.post(
-          '/api/auth/login',
+          '/auth/login',
+
           {
             email: formData.email,
             password: formData.password,

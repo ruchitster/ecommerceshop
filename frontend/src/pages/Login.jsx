@@ -51,7 +51,8 @@ function Login() {
       // =========================
       const { data } =
         await API.post(
-          '/api/auth/login',
+          '/auth/login',
+
           formData
         )
 
