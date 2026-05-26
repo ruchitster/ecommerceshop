@@ -126,7 +126,7 @@ function Checkout() {
 
         const { data } =
 await API.post(
-            '/api/payment/create-order',
+            '/payment/create-order',
             {
               amount:
                 totalAmount,
@@ -163,7 +163,7 @@ await API.post(
               // PLACE ORDER
 
 await API.post(
-                '/api/orders',
+            '/orders',
                 {
                   shippingAddress:
                     formData,

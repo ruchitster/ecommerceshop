@@ -27,8 +27,8 @@ function AdminLogin() {
       // ADMIN LOGIN API
       // =========================
       const { data } =
-        await API.post(
-          '/api/auth/admin/login',
+await API.post(
+          '/auth/admin/login',
           {
             email,
             password,

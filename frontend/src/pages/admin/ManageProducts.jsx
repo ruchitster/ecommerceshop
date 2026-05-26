@@ -9,7 +9,7 @@ function ManageProducts() {
 
   const fetchProducts = async () => {
     try {
-const { data } = await API.get('/api/products')
+const { data } = await API.get('/products')
       setProducts(data)
     } catch (error) {
       console.log(error)
