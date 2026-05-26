@@ -61,7 +61,7 @@ function ProductDetails() {
       if (!product?.image)
         return ''
 
-return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
+      return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
     }, [product])
 
@@ -73,7 +73,7 @@ return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
         const { data } =
           await API.get(
-            `/products/${id}`
+            `/api/products/${id}`
           )
 
         setProduct(data)

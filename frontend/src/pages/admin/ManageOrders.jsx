@@ -5,8 +5,7 @@ import {
 
 import API from '../../services/api'
 
-import AdminSidebar
-from '../../components/admin/AdminSidebar'
+import AdminSidebar from '../../components/admin/AdminSidebar'
 
 
 function ManageOrders() {
