@@ -43,8 +43,9 @@ function ProductDetails() {
     setError] =
     useState('')
 
-
+  // =========================
   // VARIANT STATES
+  // =========================
 
   const [selectedSize,
     setSelectedSize] =
@@ -54,33 +55,69 @@ function ProductDetails() {
     setSelectedColor] =
     useState('')
 
+  // =========================
+  // IMAGE URL
+  // =========================
 
   const imageUrl =
     useMemo(() => {
 
-      if (!product?.image)
-        return ''
+      if (!product)
+        return 'https://via.placeholder.com/500'
 
-      return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
+      // SUPPORT image OR images[0]
+      if (product.image) {
+
+        return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
+      }
+
+      if (
+        Array.isArray(product.images) &&
+        product.images.length > 0
+      ) {
+
+        return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.images[0]}`
+      }
+
+      return 'https://via.placeholder.com/500'
 
     }, [product])
 
+  // =========================
+  // FETCH PRODUCT
+  // =========================
 
   const fetchProduct =
     async () => {
 
       try {
 
+        setLoading(true)
+        setError('')
+
+        console.log('Fetching product id:', id)
+
         const { data } =
           await API.get(
             `/api/products/${id}`
           )
 
+        console.log(
+          'Fetched product:',
+          data
+        )
+
         setProduct(data)
 
       } catch (error) {
 
+        console.log(
+          'Product fetch error:',
+          error
+        )
+
         setError(
+          error?.response?.data?.message ||
           'Failed to load product'
         )
 
@@ -90,54 +127,58 @@ function ProductDetails() {
       }
     }
 
-
   useEffect(() => {
 
-    fetchProduct()
+    if (id) {
+      fetchProduct()
+    }
 
   }, [id])
 
-
+  // =========================
   // UNIQUE SIZES
+  // =========================
 
   const sizes =
     product?.variants
       ? [
-        ...new Set(
-          product.variants.map(
-            (v) => v.size
+          ...new Set(
+            product.variants.map(
+              (v) => v.size
+            )
           )
-        )
-      ]
+        ]
       : []
 
-
+  // =========================
   // UNIQUE COLORS
+  // =========================
 
   const colors =
     product?.variants
       ? [
-        ...new Set(
+          ...new Set(
 
-          product.variants
+            product.variants
 
-            .filter(
-              (v) =>
+              .filter(
+                (v) =>
 
-                v.size ===
-                selectedSize
-            )
+                  v.size ===
+                  selectedSize
+              )
 
-            .map(
-              (v) => v.color
-            )
+              .map(
+                (v) => v.color
+              )
 
-        )
-      ]
+          )
+        ]
       : []
 
-
+  // =========================
   // SELECTED VARIANT
+  // =========================
 
   const selectedVariant =
     product?.variants?.find(
@@ -151,6 +192,9 @@ function ProductDetails() {
         selectedColor
     )
 
+  // =========================
+  // ADD TO CART
+  // =========================
 
   const handleAddToCart =
     async () => {
@@ -166,8 +210,6 @@ function ProductDetails() {
 
         return
       }
-
-      // CHECK VARIANT
 
       if (
         !selectedSize ||
@@ -198,6 +240,11 @@ function ProductDetails() {
 
             price:
               selectedVariant.price,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         )
 
@@ -205,15 +252,36 @@ function ProductDetails() {
 
       } catch (error) {
 
-        console.log(error)
+        console.log(
+          'Add to cart error:',
+          error
+        )
+
+        alert(
+          error?.response?.data?.message ||
+          'Failed to add to cart'
+        )
       }
     }
 
+  // =========================
+  // SUBMIT REVIEW
+  // =========================
 
   const submitReview =
     async (e) => {
 
       e.preventDefault()
+
+      const token =
+        localStorage.getItem('token')
+
+      if (!token) {
+
+        navigate('/login')
+
+        return
+      }
 
       try {
 
@@ -224,6 +292,12 @@ function ProductDetails() {
           {
             rating,
             comment,
+          },
+
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
 
         )
@@ -238,44 +312,72 @@ function ProductDetails() {
 
       } catch (error) {
 
+        console.log(
+          'Review error:',
+          error
+        )
+
         alert(
-          error.response.data.message
+          error?.response?.data?.message ||
+          'Failed to submit review'
         )
       }
     }
 
+  // =========================
+  // LOADING
+  // =========================
 
   if (loading) {
 
     return (
 
-      <div className='min-h-screen flex items-center justify-center'>
-        Loading...
+      <div className='min-h-screen flex items-center justify-center text-2xl font-bold'>
+        Loading Product...
       </div>
 
     )
   }
 
+  // =========================
+  // ERROR
+  // =========================
+
+  if (error) {
+
+    return (
+
+      <div className='min-h-screen flex items-center justify-center text-red-500 text-2xl font-bold'>
+        {error}
+      </div>
+
+    )
+  }
+
+  // =========================
+  // PRODUCT NOT FOUND
+  // =========================
 
   if (!product) {
 
     return (
 
-      <div className='min-h-screen p-10'>
+      <div className='min-h-screen flex items-center justify-center text-2xl font-bold'>
         Product not found
       </div>
 
     )
   }
 
-
   return (
 
-    <div className='min-h-screen bg-gray-100 p-10'>
+    <div className='min-h-screen bg-gray-100 p-6 md:p-10'>
 
-      <div className='max-w-6xl mx-auto bg-white rounded-3xl p-10 shadow-lg'>
+      <div className='max-w-6xl mx-auto bg-white rounded-3xl p-6 md:p-10 shadow-lg'>
 
         <div className='grid md:grid-cols-2 gap-10'>
+
+          {/* IMAGE */}
 
           <div>
 
@@ -287,9 +389,11 @@ function ProductDetails() {
 
           </div>
 
+          {/* DETAILS */}
+
           <div>
 
-            <h1 className='text-5xl font-bold mb-4'>
+            <h1 className='text-4xl md:text-5xl font-bold mb-4'>
               {product.name}
             </h1>
 
@@ -302,14 +406,14 @@ function ProductDetails() {
               <span className='text-xl font-bold'>
 
                 {product.rating
-                  ?.toFixed(1)}
+                  ?.toFixed(1) || '0.0'}
 
               </span>
 
               <span className='text-gray-500'>
 
                 (
-                {product.numReviews}
+                {product.numReviews || 0}
                 {' '}
                 reviews
                 )
@@ -318,8 +422,7 @@ function ProductDetails() {
 
             </div>
 
-
-            {/* SIZE SELECT */}
+            {/* SIZE */}
 
             <div className='mb-5'>
 
@@ -361,8 +464,7 @@ function ProductDetails() {
 
             </div>
 
-
-            {/* COLOR SELECT */}
+            {/* COLOR */}
 
             <div className='mb-5'>
 
@@ -401,8 +503,7 @@ function ProductDetails() {
 
             </div>
 
-
-            {/* VARIANT PRICE */}
+            {/* PRICE */}
 
             {
               selectedVariant && (
@@ -432,11 +533,9 @@ function ProductDetails() {
               )
             }
 
-
             <p className='text-gray-700 text-lg leading-8 mb-8'>
               {product.description}
             </p>
-
 
             {/* QUANTITY */}
 
@@ -471,7 +570,6 @@ function ProductDetails() {
 
             </div>
 
-
             <button
               onClick={
                 handleAddToCart
@@ -498,7 +596,6 @@ function ProductDetails() {
 
         </div>
 
-
         {/* REVIEWS */}
 
         <div className='mt-16'>
@@ -506,7 +603,6 @@ function ProductDetails() {
           <h2 className='text-4xl font-bold mb-8'>
             Reviews
           </h2>
-
 
           {/* REVIEW FORM */}
 
@@ -572,8 +668,7 @@ function ProductDetails() {
 
           </form>
 
-
-          {/* REVIEW LIST */}
+          {/* REVIEWS */}
 
           <div className='space-y-6'>
 
