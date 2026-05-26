@@ -4,7 +4,7 @@ import API from '../services/api'
 
 function Home({ search }) {
 
-  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL)
+
 
   const navigate = useNavigate()
 

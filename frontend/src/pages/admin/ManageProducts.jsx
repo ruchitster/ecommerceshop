@@ -9,7 +9,7 @@ function ManageProducts() {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await API.get('/products')
+const { data } = await API.get('/api/products')
       setProducts(data)
     } catch (error) {
       console.log(error)
@@ -25,7 +25,7 @@ function ManageProducts() {
     if (!ok) return
 
     try {
-      await API.delete(`/products/${id}`)
+await API.delete(`/api/products/${id}`)
       fetchProducts()
     } catch (error) {
       console.log(error)

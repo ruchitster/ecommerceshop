@@ -21,8 +21,8 @@ function ManageOrders() {
       try {
 
         const { data } =
-          await API.get(
-            '/orders'
+await API.get(
+            '/api/orders'
           )
 
         setOrders(data)
@@ -49,8 +49,8 @@ function ManageOrders() {
 
       try {
 
-        await API.put(
-          `/orders/${orderId}`,
+await API.put(
+          `/api/orders/${orderId}`,
           { status }
         )
 

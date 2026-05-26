@@ -125,8 +125,8 @@ function Checkout() {
         // CREATE PAYMENT ORDER
 
         const { data } =
-          await API.post(
-            '/payment/create-order',
+await API.post(
+            '/api/payment/create-order',
             {
               amount:
                 totalAmount,
@@ -162,8 +162,8 @@ function Checkout() {
 
               // PLACE ORDER
 
-              await API.post(
-                '/orders',
+await API.post(
+                '/api/orders',
                 {
                   shippingAddress:
                     formData,
@@ -322,7 +322,7 @@ function Checkout() {
                   className='border rounded-2xl p-4 flex gap-4'
                 >
 
-                  <img
+<img
 src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                     alt={item.product.name}
                     className='w-24 h-24 rounded-2xl object-cover'
