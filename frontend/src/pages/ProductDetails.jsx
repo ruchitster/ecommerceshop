@@ -73,7 +73,7 @@ return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
         const { data } =
           await API.get(
-            `/products/${id}`
+            `/api/products/${id}`
           )
 
         setProduct(data)
@@ -184,7 +184,7 @@ return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
       try {
 
         await API.post(
-          '/cart/add',
+          '/api/cart/add',
           {
             productId: id,
 
@@ -219,7 +219,7 @@ return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
 
         await API.post(
 
-          `/products/${id}/reviews`,
+          `/api/products/${id}/reviews`,
 
           {
             rating,
