@@ -480,6 +480,9 @@ function Home({ search }) {
                       onClick={() => {
                         console.log('View clicked product:', product)
                         console.log('product._id:', product?._id)
+                        console.log('API URL:',
+                       `${import.meta.env.VITE_API_URL}/api/products/${id}`
+                          )
 
                         if (!product?._id) {
                           alert('Invalid product id')
