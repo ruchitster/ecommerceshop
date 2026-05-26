@@ -118,11 +118,11 @@ function Home({ search }) {
 
       const data = response.data
 
-      setCategories(
-        Array.isArray(data)
-          ? data
-          : data.categories || []
-      )
+    setCategories(
+      Array.isArray(data)
+        ? data
+        : data.categories || data || []
+    )
 
     } catch (error) {
 
@@ -475,9 +475,17 @@ function Home({ search }) {
                     </span>
 
                     <button
-                      onClick={() =>
+                      onClick={() => {
+                        console.log('View clicked product:', product)
+                        console.log('product._id:', product?._id)
+
+                        if (!product?._id) {
+                          alert('Invalid product id')
+                          return
+                        }
+
                         navigate(`/product/${product._id}`)
-                      }
+                      }}
                       className="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800"
                     >
                       View
