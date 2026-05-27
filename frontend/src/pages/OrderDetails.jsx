@@ -83,13 +83,10 @@ function OrderDetails() {
 
       try {
 
-        // ✅ TOKEN automatically added
-        // by axios interceptor
-
         const res =
           await API.get(
 
-            `/invoice/${id}`,
+            `/orders/${id}/invoice`,
 
             {
               responseType: 'blob',
@@ -98,7 +95,10 @@ function OrderDetails() {
           )
 
         const blob =
-          res.data
+          new Blob(
+            [res.data],
+            { type: 'application/pdf' }
+          )
 
         const url =
           window.URL.createObjectURL(blob)
