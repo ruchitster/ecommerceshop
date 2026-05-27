@@ -86,7 +86,7 @@ function OrderDetails() {
         const res =
           await API.get(
 
-            `/orders/${id}/invoice`,
+            `/invoice/${id}`,
 
             {
               responseType: 'blob',
@@ -369,25 +369,6 @@ function OrderDetails() {
         {/* TOTAL */}
 
         <div className="mt-10 border-t pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-          <div>
-
-            <p className="text-gray-500">
-
-              Payment Status:
-              {' '}
-
-              <span className="font-bold">
-
-                {order.isPaid
-                  ? 'Paid'
-                  : 'Pending'}
-
-              </span>
-
-            </p>
-
-          </div>
 
           <h2 className="text-4xl font-bold text-green-600">
 
