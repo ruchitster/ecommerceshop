@@ -65,7 +65,6 @@ function ProductDetails() {
       if (!product)
         return 'https://via.placeholder.com/500'
 
-      // SUPPORT image OR images[0]
       if (product.image) {
 
         return `${import.meta.env.VITE_API_UPLOADS_URL}/${product.image}`
@@ -95,11 +94,15 @@ function ProductDetails() {
         setLoading(true)
         setError('')
 
-        console.log('Fetching product id:', id)
+        console.log(
+          'Fetching product id:',
+          id
+        )
 
+        // ✅ FIXED
         const { data } =
           await API.get(
-            `/api/products/${id}`
+            `/products/${id}`
           )
 
         console.log(
@@ -225,7 +228,7 @@ function ProductDetails() {
 
       try {
 
-await API.post(
+        await API.post(
           '/cart/add',
           {
             productId: id,
@@ -285,9 +288,10 @@ await API.post(
 
       try {
 
+        // ✅ FIXED
         await API.post(
 
-          `/api/products/${id}/reviews`,
+          `/products/${id}/reviews`,
 
           {
             rating,
@@ -591,127 +595,6 @@ await API.post(
               }
 
             </button>
-
-          </div>
-
-        </div>
-
-        {/* REVIEWS */}
-
-        <div className='mt-16'>
-
-          <h2 className='text-4xl font-bold mb-8'>
-            Reviews
-          </h2>
-
-          {/* REVIEW FORM */}
-
-          <form
-            onSubmit={submitReview}
-            className='bg-gray-100 p-8 rounded-3xl mb-10'
-          >
-
-            <h3 className='text-2xl font-bold mb-5'>
-              Write a Review
-            </h3>
-
-            <select
-              value={rating}
-              onChange={(e) =>
-                setRating(
-                  e.target.value
-                )
-              }
-              className='w-full border p-4 rounded-xl mb-5'
-            >
-
-              <option value='1'>
-                1 Star
-              </option>
-
-              <option value='2'>
-                2 Stars
-              </option>
-
-              <option value='3'>
-                3 Stars
-              </option>
-
-              <option value='4'>
-                4 Stars
-              </option>
-
-              <option value='5'>
-                5 Stars
-              </option>
-
-            </select>
-
-            <textarea
-              rows='5'
-              placeholder='Write review'
-              value={comment}
-              onChange={(e) =>
-                setComment(
-                  e.target.value
-                )
-              }
-              className='w-full border p-4 rounded-xl mb-5'
-            ></textarea>
-
-            <button
-              type='submit'
-              className='bg-black text-white px-8 py-4 rounded-xl'
-            >
-              Submit Review
-            </button>
-
-          </form>
-
-          {/* REVIEWS */}
-
-          <div className='space-y-6'>
-
-            {product.reviews
-              ?.length === 0 ? (
-
-              <p>
-                No Reviews Yet
-              </p>
-
-            ) : (
-
-              product.reviews.map(
-                (review) => (
-
-                  <div
-                    key={review._id}
-                    className='bg-white border p-6 rounded-3xl'
-                  >
-
-                    <div className='flex items-center justify-between mb-3'>
-
-                      <h3 className='text-2xl font-bold'>
-                        {review.name}
-                      </h3>
-
-                      <span className='text-yellow-500 text-xl'>
-                        {'⭐'.repeat(
-                          review.rating
-                        )}
-                      </span>
-
-                    </div>
-
-                    <p className='text-gray-700'>
-                      {review.comment}
-                    </p>
-
-                  </div>
-
-                )
-              )
-            )}
 
           </div>
 
