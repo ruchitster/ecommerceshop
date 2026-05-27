@@ -7,32 +7,62 @@ import API from '../../services/api'
 
 import AdminSidebar from '../../components/admin/AdminSidebar'
 
-
 function ManageOrders() {
 
   const [orders,
     setOrders] =
     useState([])
 
+  const [loading,
+    setLoading] =
+    useState(true)
+
+  const [error,
+    setError] =
+    useState('')
+
+  // =========================
+  // FETCH ORDERS
+  // =========================
 
   const fetchOrders =
     async () => {
 
       try {
 
+        setLoading(true)
+        setError('')
+
+        // ✅ FIXED
         const { data } =
-await API.get(
-            '/api/orders'
+          await API.get(
+            '/orders'
           )
 
-        setOrders(data)
+        console.log(
+          'Orders:',
+          data
+        )
+
+        setOrders(data || [])
 
       } catch (error) {
 
-        console.log(error)
+        console.log(
+          'Orders Error:',
+          error
+        )
+
+        setError(
+          error?.response?.data?.message ||
+          'Failed to load orders'
+        )
+
+      } finally {
+
+        setLoading(false)
       }
     }
-
 
   useEffect(() => {
 
@@ -40,6 +70,9 @@ await API.get(
 
   }, [])
 
+  // =========================
+  // UPDATE STATUS
+  // =========================
 
   const updateStatus =
     async (
@@ -49,8 +82,9 @@ await API.get(
 
       try {
 
-await API.put(
-          `/api/orders/${orderId}`,
+        // ✅ FIXED
+        await API.put(
+          `/orders/${orderId}`,
           { status }
         )
 
@@ -58,10 +92,54 @@ await API.put(
 
       } catch (error) {
 
-        console.log(error)
+        console.log(
+          'Update Status Error:',
+          error
+        )
       }
     }
 
+  // =========================
+  // LOADING
+  // =========================
+
+  if (loading) {
+
+    return (
+
+      <div className='flex'>
+
+        <AdminSidebar />
+
+        <div className='flex-1 flex items-center justify-center min-h-screen text-2xl font-bold'>
+          Loading Orders...
+        </div>
+
+      </div>
+
+    )
+  }
+
+  // =========================
+  // ERROR
+  // =========================
+
+  if (error) {
+
+    return (
+
+      <div className='flex'>
+
+        <AdminSidebar />
+
+        <div className='flex-1 flex items-center justify-center min-h-screen text-red-500 text-2xl font-bold'>
+          {error}
+        </div>
+
+      </div>
+
+    )
+  }
 
   return (
 
@@ -75,13 +153,10 @@ await API.put(
           Manage Orders
         </h1>
 
-
         {orders.length === 0 ? (
 
           <div className='bg-white p-8 rounded-3xl shadow-lg'>
-
             No Orders Found
-
           </div>
 
         ) : (
@@ -120,7 +195,6 @@ await API.put(
 
                     </div>
 
-
                     <select
                       value={
                         order.orderStatus
@@ -156,7 +230,6 @@ await API.put(
 
                   </div>
 
-
                   {/* ORDER ITEMS */}
 
                   <div className='space-y-5'>
@@ -179,7 +252,7 @@ await API.put(
                             {item.product && (
 
                               <img
-src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
+                                src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                                 alt={item.product.name}
                                 className='w-24 h-24 rounded-2xl object-cover'
                               />
@@ -195,7 +268,6 @@ src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                                   : 'Product Deleted'}
 
                               </h3>
-
 
                               {/* VARIANT */}
 
@@ -219,7 +291,6 @@ src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
 
                               </div>
 
-
                               <p className='text-gray-600'>
 
                                 Price:
@@ -239,7 +310,6 @@ src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                             </div>
 
                           </div>
-
 
                           {/* RIGHT */}
 
@@ -263,7 +333,6 @@ src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                     )}
 
                   </div>
-
 
                   {/* FOOTER */}
 
@@ -313,7 +382,6 @@ src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`}
                       </p>
 
                     </div>
-
 
                     {/* TOTAL */}
 
