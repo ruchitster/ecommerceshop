@@ -1,148 +1,417 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import {
+  useEffect,
+  useState,
+} from 'react'
+
+import {
+  useParams,
+} from 'react-router-dom'
+
 import API from '../services/api'
 
 function OrderDetails() {
-  const { id } = useParams()
 
-  const [order, setOrder] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { id } =
+    useParams()
 
-  const fetchOrder = async () => {
-    try {
-      setLoading(true)
+  const [order,
+    setOrder] =
+    useState(null)
 
-      const { data } = await API.get(`/orders/${id}`)
+  const [loading,
+    setLoading] =
+    useState(true)
 
-      setOrder(data)
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
+  const [error,
+    setError] =
+    useState('')
+
+  // =========================
+  // FETCH ORDER
+  // =========================
+
+  const fetchOrder =
+    async () => {
+
+      try {
+
+        setLoading(true)
+        setError('')
+
+        const { data } =
+          await API.get(
+            `/orders/${id}`
+          )
+
+        console.log(
+          'Order:',
+          data
+        )
+
+        setOrder(data)
+
+      } catch (error) {
+
+        console.log(
+          'Order Error:',
+          error
+        )
+
+        setError(
+          error?.response?.data?.message ||
+          'Failed to load order'
+        )
+
+      } finally {
+
+        setLoading(false)
+      }
     }
-  }
 
   useEffect(() => {
+
     fetchOrder()
+
   }, [id])
 
-  const downloadInvoice = async () => {
-    try {
-      const token = localStorage.getItem('token')
+  // =========================
+  // DOWNLOAD INVOICE
+  // =========================
 
-      const res = await API.get(`/api/invoice/${id}`, {
-        responseType: 'blob',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  const downloadInvoice =
+    async () => {
 
-      const blob = res.data
-      const url = window.URL.createObjectURL(blob)
+      try {
 
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `invoice-${id}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
+        // ✅ TOKEN automatically added
+        // by axios interceptor
 
-      window.URL.revokeObjectURL(url)
-    } catch (error) {
-      console.log(error)
-      alert('Invoice download failed')
+        const res =
+          await API.get(
+
+            `/invoice/${id}`,
+
+            {
+              responseType: 'blob',
+            }
+
+          )
+
+        const blob =
+          res.data
+
+        const url =
+          window.URL.createObjectURL(blob)
+
+        const a =
+          document.createElement('a')
+
+        a.href = url
+
+        a.download =
+          `invoice-${id}.pdf`
+
+        document.body.appendChild(a)
+
+        a.click()
+
+        a.remove()
+
+        window.URL.revokeObjectURL(url)
+
+      } catch (error) {
+
+        console.log(
+          'Invoice Error:',
+          error
+        )
+
+        alert(
+
+          error?.response?.data?.message ||
+
+          'Invoice download failed'
+        )
+      }
     }
-  }
+
+  // =========================
+  // LOADING
+  // =========================
 
   if (loading) {
+
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading order...
+
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+        Loading Order...
       </div>
+
     )
   }
 
-  if (!order) {
+  // =========================
+  // ERROR
+  // =========================
+
+  if (error) {
+
     return (
-      <div className="min-h-screen flex items-center justify-center">
+
+      <div className="min-h-screen flex items-center justify-center text-red-500 text-2xl font-bold">
+        {error}
+      </div>
+
+    )
+  }
+
+  // =========================
+  // ORDER NOT FOUND
+  // =========================
+
+  if (!order) {
+
+    return (
+
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
         Order not found
       </div>
+
     )
   }
 
   return (
+
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-3xl shadow-lg">
+
+      <div className="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-lg">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
+
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
+
           <div>
-            <h1 className="text-3xl font-bold">
-              Order #{order._id.slice(-6)}
+
+            <h1 className="text-4xl font-bold">
+
+              Order #
+              {order._id.slice(-6)}
+
             </h1>
 
-            <p className="text-gray-500">
-              {new Date(order.createdAt).toLocaleDateString()}
+            <p className="text-gray-500 mt-2">
+
+              {new Date(
+                order.createdAt
+              ).toLocaleDateString()}
+
             </p>
+
           </div>
 
-          <span className="text-green-600 font-bold text-lg">
+          <span className="text-green-600 font-bold text-xl">
+
             {order.orderStatus}
+
           </span>
+
         </div>
 
         {/* ITEMS */}
-        <div className="space-y-4">
-          {order.items.map((item, index) => (
-            <div
-              key={index}
-              className="border p-4 rounded-2xl flex justify-between"
-            >
-              <div className="flex gap-4">
-                <img
-src={`${import.meta.env.VITE_API_UPLOADS_URL}/${item.product?.image}`}
-                  alt=""
-                  className="w-20 h-20 object-cover rounded-xl"
-                />
 
-                <div>
-                  <h2 className="font-bold">
-                    {item.product?.name || 'Deleted Product'}
-                  </h2>
+        <div className="space-y-5">
 
-                  <p className="text-sm text-gray-500">
-                    Size: {item.size || 'N/A'} | Color:{' '}
-                    {item.color || 'N/A'}
-                  </p>
+          {order.items.map(
+            (
+              item,
+              index
+            ) => (
 
-                  <p>Qty: {item.quantity}</p>
-                  <p>Price: ₹{item.price}</p>
+              <div
+                key={index}
+                className="border p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-5"
+              >
+
+                {/* LEFT */}
+
+                <div className="flex gap-5">
+
+                  <img
+                    src={
+                      item.product?.image
+
+                        ? `${import.meta.env.VITE_API_UPLOADS_URL}/${item.product.image}`
+
+                        : 'https://via.placeholder.com/100'
+                    }
+
+                    alt={
+                      item.product?.name
+                    }
+
+                    className="w-24 h-24 object-cover rounded-2xl"
+                  />
+
+                  <div>
+
+                    <h2 className="text-xl font-bold mb-2">
+
+                      {item.product?.name ||
+                        'Deleted Product'}
+
+                    </h2>
+
+                    <p className="text-gray-500 mb-2">
+
+                      Size:
+                      {' '}
+                      {item.size || 'N/A'}
+
+                      {' | '}
+
+                      Color:
+                      {' '}
+                      {item.color || 'N/A'}
+
+                    </p>
+
+                    <p className="text-gray-700">
+
+                      Quantity:
+                      {' '}
+                      {item.quantity}
+
+                    </p>
+
+                    <p className="text-gray-700">
+
+                      Price:
+                      {' '}
+                      ₹
+                      {item.price}
+
+                    </p>
+
+                  </div>
+
                 </div>
+
+                {/* RIGHT */}
+
+                <div className="text-right">
+
+                  <h3 className="text-2xl font-bold text-green-600">
+
+                    ₹
+                    {item.price *
+                      item.quantity}
+
+                  </h3>
+
+                </div>
+
               </div>
 
-              <div className="font-bold text-green-600">
-                ₹{item.price * item.quantity}
-              </div>
-            </div>
-          ))}
+            )
+          )}
+
+        </div>
+
+        {/* SHIPPING */}
+
+        <div className="mt-10 border-t pt-8">
+
+          <h2 className="text-2xl font-bold mb-5">
+            Shipping Address
+          </h2>
+
+          <div className="space-y-2 text-gray-700">
+
+            <p>
+              {
+                order.shippingAddress
+                  ?.fullName
+              }
+            </p>
+
+            <p>
+              {
+                order.shippingAddress
+                  ?.phone
+              }
+            </p>
+
+            <p>
+              {
+                order.shippingAddress
+                  ?.address
+              }
+            </p>
+
+            <p>
+              {
+                order.shippingAddress
+                  ?.city
+              }
+            </p>
+
+            <p>
+              {
+                order.shippingAddress
+                  ?.postalCode
+              }
+            </p>
+
+          </div>
+
         </div>
 
         {/* TOTAL */}
-        <div className="mt-6 text-right border-t pt-5">
-          <h2 className="text-2xl font-bold text-green-600">
-            Total: ₹{order.totalAmount}
+
+        <div className="mt-10 border-t pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+
+          <div>
+
+            <p className="text-gray-500">
+
+              Payment Status:
+              {' '}
+
+              <span className="font-bold">
+
+                {order.isPaid
+                  ? 'Paid'
+                  : 'Pending'}
+
+              </span>
+
+            </p>
+
+          </div>
+
+          <h2 className="text-4xl font-bold text-green-600">
+
+            Total:
+            {' '}
+
+            ₹
+            {order.totalAmount}
+
           </h2>
+
         </div>
 
         {/* INVOICE BUTTON */}
+
         <button
           onClick={downloadInvoice}
-          className="mt-6 bg-black text-white px-6 py-3 rounded-2xl"
+          className="mt-8 bg-black text-white px-8 py-4 rounded-2xl hover:bg-gray-800 transition"
         >
           Download Invoice
         </button>
 
       </div>
+
     </div>
   )
 }
